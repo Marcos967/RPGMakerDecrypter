@@ -1,4 +1,4 @@
-name: Build .NET CLI for Termux
+name: Build uuksu CLI for Termux
 on: [push, workflow_dispatch]
 jobs:
   build:
@@ -9,10 +9,12 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Publish
-        run: dotnet publish RPGMakerDecrypter.CLI/RPGMakerDecrypter.CLI.csproj -c Release -r linux-arm64 --self-contained true /p:PublishSingleFile=true /p:PublishTrimmed=true
+      - name: Publish for Android/Termux
+        run: |
+          # O comando abaixo compila o projeto especificamente para Linux ARM64 (Android)
+          dotnet publish RPGMakerDecrypter.CLI/RPGMakerDecrypter.CLI.csproj -c Release -r linux-arm64 --self-contained true /p:PublishSingleFile=true /p:PublishTrimmed=true -o ./publish_output
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rpg-decrypter-dotnet
-          path: RPGMakerDecrypter.CLI/bin/Release/net8.0/linux-arm64/publish/RPGMakerDecrypter.CLI
+          name: rpg-decrypter-uuksu-arm64
+          path: ./publish_output/RPGMakerDecrypter.CLI
