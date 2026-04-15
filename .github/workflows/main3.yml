@@ -3,7 +3,7 @@ name: Build for Termux (ARM64)
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # Permite rodar manualmente
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,15 +16,12 @@ jobs:
       - name: Configurar .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x' # Ou a versão exigida no .csproj
+          dotnet-version: '8.0.x'
 
-      - name: Restaurar dependências
-        run: dotnet restore
-
-      - name: Compilar para Termux (Linux ARM64)
+      - name: Compilar Executável para Termux
         run: |
-          # Procura o arquivo .csproj automaticamente para evitar erro de caminho
-          PROJECT_FILE=$(find . -name "*.csproj" | head -n 1)
+          # Busca especificamente pelo projeto CLI ou o principal
+          PROJECT_FILE=$(find . -name "*Cli.csproj" -o -name "RPGMakerDecrypter.csproj" | head -n 1)
           echo "Compilando projeto: $PROJECT_FILE"
           
           dotnet publish $PROJECT_FILE \
@@ -32,8 +29,13 @@ jobs:
           -r linux-arm64 \
           --self-contained true \
           -p:PublishSingleFile=true \
-          -p:PublishTrimmed=true \
           -o ./publish
+
+      - name: Upload do Binário
+        uses: actions/upload-artifact@v4
+        with:
+          name: RPGMakerDecrypter-Termux
+          path: ./publish/
 
       - name: Upload do Binário
         uses: actions/upload-artifact@v4
