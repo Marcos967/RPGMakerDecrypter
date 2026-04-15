@@ -1,0 +1,43 @@
+name: Build for Termux (ARM64)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Permite rodar manualmente
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # Ou a versão exigida no .csproj
+
+      - name: Restaurar dependências
+        run: dotnet restore
+
+      - name: Compilar para Termux (Linux ARM64)
+        # -r linux-arm64: Define o alvo para processadores de celular
+        # -c Release: Otimiza o código
+        # --self-contained true: Inclui tudo o que é necessário para rodar sozinho
+        # -p:PublishSingleFile=true: Junta tudo em um único arquivo binário
+        run: |
+          dotnet publish RPGMakerDecrypter-cli/RPGMakerDecrypter-cli.csproj \
+          -c Release \
+          -r linux-arm64 \
+          --self-contained true \
+          -p:PublishSingleFile=true \
+          -p:PublishTrimmed=true \
+          -o ./publish
+
+      - name: Upload do Binário
+        uses: actions/upload-artifact@v4
+        with:
+          name: RPGMakerDecrypter-Termux-ARM64
+          path: ./publish/RPGMakerDecrypter-cli
+          
