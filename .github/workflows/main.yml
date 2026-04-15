@@ -1,17 +1,20 @@
-name: Build for Android
+name: Build for Termux
 on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust
-        run: rustup target add aarch64-linux-android
+      - name: Install Cross-Compilation Tools
+        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
+      - name: Install Rust Target
+        run: rustup target add aarch64-unknown-linux-gnu
       - name: Build
-        run: cargo build --release --target aarch64-linux-android
+        run: |
+          export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
+          cargo build --release --target aarch64-unknown-linux-gnu
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rpg-decrypter-android
-          path: target/aarch64-linux-android/release/RPGMakerDecrypter-cli
-          
+          name: rpg-decrypter-termux
+          path: target/aarch64-unknown-linux-gnu/release/RPGMakerDecrypter-cli
