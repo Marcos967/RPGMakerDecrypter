@@ -10,7 +10,7 @@ jobs:
       - name: Install Rust Target
         run: rustup target add aarch64-unknown-linux-gnu
       - name: Build
-        working-directory: ./cli
+        working-directory: RPGMakerDecrypter.Cli
         run: |
           export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
           cargo build --release --target aarch64-unknown-linux-gnu
