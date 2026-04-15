@@ -22,12 +22,12 @@ jobs:
         run: dotnet restore
 
       - name: Compilar para Termux (Linux ARM64)
-        # -r linux-arm64: Define o alvo para processadores de celular
-        # -c Release: Otimiza o código
-        # --self-contained true: Inclui tudo o que é necessário para rodar sozinho
-        # -p:PublishSingleFile=true: Junta tudo em um único arquivo binário
         run: |
-          dotnet publish RPGMakerDecrypter-cli/RPGMakerDecrypter-cli.csproj \
+          # Procura o arquivo .csproj automaticamente para evitar erro de caminho
+          PROJECT_FILE=$(find . -name "*.csproj" | head -n 1)
+          echo "Compilando projeto: $PROJECT_FILE"
+          
+          dotnet publish $PROJECT_FILE \
           -c Release \
           -r linux-arm64 \
           --self-contained true \
