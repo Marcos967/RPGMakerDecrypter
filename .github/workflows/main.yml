@@ -1,21 +1,18 @@
-name: Build for Termux
+name: Build .NET CLI for Termux
 on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Cross-Compilation Tools
-        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
-      - name: Install Rust Target
-        run: rustup target add aarch64-unknown-linux-gnu
-      - name: Build
-        working-directory: RPGMakerDecrypter.Cli
-        run: |
-          export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
-          cargo build --release --target aarch64-unknown-linux-gnu
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish
+        run: dotnet publish RPGMakerDecrypter.CLI/RPGMakerDecrypter.CLI.csproj -c Release -r linux-arm64 --self-contained true /p:PublishSingleFile=true /p:PublishTrimmed=true
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rpg-decrypter-termux
-          path: cli/target/aarch64-unknown-linux-gnu/release/RPGMakerDecrypter-cli
+          name: rpg-decrypter-dotnet
+          path: RPGMakerDecrypter.CLI/bin/Release/net8.0/linux-arm64/publish/RPGMakerDecrypter.CLI
