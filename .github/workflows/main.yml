@@ -1,21 +1,31 @@
-name: Build uuksu CLI for Termux
-on: [push, workflow_dispatch]
+name: Build para Termux ARM64
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
 jobs:
-  build:
+  build-termux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      - name: Publish for Android/Termux
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Compilar no container Termux
         run: |
-          # Procura o arquivo .csproj automaticamente
-          PROJECT_PATH=$(find . -name "RPGMakerDecrypter.CLI.csproj")
-          dotnet publish "$PROJECT_PATH" -c Release -r linux-arm64 --self-contained true /p:PublishSingleFile=true /p:PublishTrimmed=true -o ./output
-      - name: Upload Artifact
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace termux/termux-docker:aarch64 /bin/sh -c "
+            pkg update && pkg upgrade -y
+            pkg install -y build-essential cmake git
+            cmake . -B build -DCMAKE_BUILD_TYPE=Release
+            cmake --build build
+          "
+
+      - name: Upload do Binário
         uses: actions/upload-artifact@v4
         with:
-          name: rpg-decrypter-uuksu-arm64
-          path: ./output/RPGMakerDecrypter.CLI
+          name: RPGMakerDecrypter-Termux-ARM64
+          path: build/RPGMakerDecrypter-cli
