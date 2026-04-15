@@ -10,6 +10,7 @@ jobs:
       - name: Install Rust Target
         run: rustup target add aarch64-unknown-linux-gnu
       - name: Build
+        working-directory: ./cli
         run: |
           export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
           cargo build --release --target aarch64-unknown-linux-gnu
@@ -17,4 +18,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rpg-decrypter-termux
-          path: target/aarch64-unknown-linux-gnu/release/RPGMakerDecrypter-cli
+          path: cli/target/aarch64-unknown-linux-gnu/release/RPGMakerDecrypter-cli
