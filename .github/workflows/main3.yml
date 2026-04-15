@@ -20,15 +20,17 @@ jobs:
 
       - name: Compilar Executável para Termux
         run: |
-          # Busca especificamente pelo projeto CLI ou o principal
           PROJECT_FILE=$(find . -name "*Cli.csproj" -o -name "RPGMakerDecrypter.csproj" | head -n 1)
-          echo "Compilando projeto: $PROJECT_FILE"
           
           dotnet publish $PROJECT_FILE \
           -c Release \
           -r linux-arm64 \
           --self-contained true \
           -p:PublishSingleFile=true \
+          -p:CheckConstraints=false \
+          -p:LinkerFlavor=lld \
+          -p:CustomLibunwind=true \
+          -p:ElfSectionAlignment=64 \
           -o ./publish
 
       - name: Upload do Binário
